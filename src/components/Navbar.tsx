@@ -12,6 +12,8 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import EasyB2BLogo from "./EasyB2B.png";
+import { width } from "@mui/system";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -43,24 +45,12 @@ function Navbar() {
     <AppBar position="static">
       <Container>
         <Toolbar disableGutters sx={{ justifyContent: "center" }}>
-          <AdbIcon sx={{ display: { md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { md: "flex" },
-              fontFamily: "Roboto",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            Citi QR-Gen
-          </Typography>
+          <img
+            src={`${EasyB2BLogo}`}
+            alt={"Citi bank logo"}
+            style={{ height: "140px", width: "auto" }}
+            loading="lazy"
+          />
         </Toolbar>
       </Container>
     </AppBar>

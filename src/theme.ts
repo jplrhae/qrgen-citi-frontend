@@ -13,6 +13,9 @@ const theme = createTheme({
     error: {
       main: red.A400,
     },
+    background: {
+      default: "linear-gradient(160deg, #0093E9 0%, #80D0C7 100%)",
+    },
   },
 });
 
