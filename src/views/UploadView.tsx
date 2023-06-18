@@ -12,6 +12,7 @@ export default function UploadView() {
   const [lastUploadedRecord, setLastUploadedRecord] = React.useState<any>();
   const [errorWhenFetchingLast, setErrorWhenFetchingLast] =
     React.useState<boolean>(false);
+  const [processedFileData, setProcessedFileData] = React.useState<any>();
 
   const handleChange = (fileList: FileList | null) => {
     if (fileList) {
@@ -38,7 +39,7 @@ export default function UploadView() {
       const data = await response.json();
       console.log("Data from server: ", data);
       setStatus("success");
-      setLastUploadedRecord(data);
+      localStorage.setItem('filename', data.file_id)
 
       setTimeout(() => {
         fetchIfRecordProcessed();
@@ -66,20 +67,47 @@ export default function UploadView() {
   const fetchIfRecordProcessed = async () => {
     while (true) {
       const response = await fetch(
-        `http://localhost:8080/record/${lastUploadedRecord?.file_id}}`
+        `http://localhost:8080/download/${localStorage.getItem('filename')}`,
+        {
+          method: "GET"
+        }
       );
-      if (!response.ok) {
+      if (response.status != 200) {
         setIsUploading(false);
         setErrorWhenFetchingLast(true);
         break;
       }
+      else{
+        const data = await response.json();
+        console.log("Data from fetch of record processed: ", data);
+        if (data.historic != null){
+          const filename = data.file.filename;
+          const mediaType = data.file.media_type;
+          const path = data.file.path;
+          const headers = data.file._headers;
+        
+          const response = {
+            headers: headers,
+            async blob() {
+              const blob = new Blob([path], { type: mediaType });
+              return blob;
+            }
+          };
+        
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.click();
+          URL.revokeObjectURL(url);
 
-      const data = await response.json();
-      console.log("Data from fetch of record processed: ", data);
-      if (data.Status === "processed") {
-        setIsUploading(false);
-        setDidRetrieveFile(true);
-        break;
+          console.log("Data from fetch of record processed: ", data);
+          setProcessedFileData(data);
+          setIsUploading(false);
+          setDidRetrieveFile(true);
+          break;
+        }
       }
     }
 
@@ -139,6 +167,9 @@ export default function UploadView() {
             histórico.
           </Alert>
         </div>
+      )}
+      {processedFileData && (
+        <p>Código QR Code de retorno: {processedFileData.historic.qr_code_string}</p>
       )}
     </>
   );
